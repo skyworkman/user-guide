@@ -1,4 +1,6 @@
+import { DefaultHighlightLayer } from "../layer/highlight/HighLightLayerImpl"
 import { DefaultMaskLayer } from "../layer/mask/MaskLayerImpl"
+import { DefaultTooltipLayer } from "../layer/tooltip/ToolTipLayerImpl"
 
 export interface UserGuideOptionStep {
   // 目标元素选择式
@@ -20,27 +22,11 @@ export class UserGuideService {
 
   create(steps: UserGuideOptionStep[], config: { enableBackDropClose?: boolean }) {
     const maskLayer = DefaultMaskLayer()
-    config.positionStrategy = this.overlay.position().global()
-    config.panelClass = "max-zindex"
-    const overlayRef = this.overlay.create(config)
-    // overlay置顶
-    overlayRef.hostElement.style.zIndex = "99999"
-    const maskOverlayRef = new UserGuideMaskRef(overlayRef, steps, enableBackDropClose)
-    maskOverlayRef.afterClosed$.subscribe(closeData => {
-      if (closeData.type === "complate" || closeData.type === "manualy") {
-        // 不再提示(记住)
-        if (closeData.data.noMore) {
-          this.setNoMoreFlag("true")
-        } else if (closeData.data.noMore === false) {
-          this.setNoMoreFlag("false")
-        }
-      }
-    })
-    // 为guide container 注入mask ref
-    const injector = this.createInjector(maskOverlayRef, this.injector)
-    const container = new ComponentPortal(UserGuideContainerComponent, null, injector)
-    overlayRef.attach(container)
-    return maskOverlayRef
+    const tootipLayer = DefaultTooltipLayer()
+    const highlightLayer = DefaultHighlightLayer()
+    // TODO: composite
+    // ...
+    // TODO: return userGuideRef
   }
 
   setNoMoreFlag(value: "true" | "false") {
